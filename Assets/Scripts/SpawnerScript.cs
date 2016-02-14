@@ -27,10 +27,10 @@ public class SpawnerScript : MonoBehaviour {
 	void Start () 
     {
         m_asteroidSpawnPosition = new Vector3[m_asteroidRandomPositions];
-        m_asteroidSpawnPosition[0] = new Vector3(0, 10, 0);
+        m_asteroidSpawnPosition[0] = new Vector3(0, 11, 0);
         m_asteroidSpawnPosition[1] = new Vector3(0, -10, 0);
-        m_asteroidSpawnPosition[2] = new Vector3(18, 0, 0);
-        m_asteroidSpawnPosition[3] = new Vector3(-18, 0, 0);
+        m_asteroidSpawnPosition[2] = new Vector3(22, 0, 0);
+        m_asteroidSpawnPosition[3] = new Vector3(-22, 0, 0);
 
         m_alienSpawnPosition = new Vector3[m_alienRandomPositions];
         m_alienSpawnPosition[0] = new Vector3(-18, 4, 0);
@@ -63,7 +63,8 @@ public class SpawnerScript : MonoBehaviour {
             int randomInt = Random.Range(0, m_asteroidRandomPositions);
 
             GameObject obj = Instantiate(Resources.Load("Prefabs/Asteroid"), m_asteroidSpawnPosition[randomInt], Quaternion.identity) as GameObject;
-            obj.transform.localScale = new Vector3(80, 90, 100);
+
+            obj.transform.localScale = new Vector3(Random.Range(90, 120), Random.Range(90, 120), Random.Range(90, 120));
 
             m_asteroidSpawnTime = m_asteroidSpawnCooldown;
             --m_asteroidsToSpawn;

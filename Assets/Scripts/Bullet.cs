@@ -1,24 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Bullet : WrappableObject {
+public class Bullet : MonoBehaviour {
 
-	// Use this for initialization
     private float m_speed = 20.0f;
-    private float m_lifetime = 2.0f;
+    private float m_lifetime = 1.0f;
 
     Vector3 m_direction;
 
-	protected override void Start () 
+	void Start () 
     {
-        base.Start();
 	}
 
 
-    protected override void FixedUpdate() 
+    void FixedUpdate() 
     {
-        base.FixedUpdate();
-
 	    // We want this to move along its direction vector
         transform.Translate(m_direction * (m_speed * Time.deltaTime));
 

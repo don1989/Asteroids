@@ -4,7 +4,7 @@ using System.Collections;
 public class Enemy : WrappableObject {
 
     protected int m_scoreToAdd;
-    protected float movementAmount = 5.0f;
+    protected float movementAmount = 2.0f;
 
 	// Use this for initialization
     protected override void Start() 

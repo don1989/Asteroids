@@ -17,14 +17,22 @@ public abstract class WrappableObject : MonoBehaviour {
         // Check bounds and screen wrap
         Vector3 tmpPos = Camera.main.WorldToScreenPoint (transform.position);
 
-        if (tmpPos.x > (Screen.width + m_extent) || tmpPos.x < -m_extent) 
+        if (tmpPos.x > (Screen.width + m_extent) ) 
         {
-            transform.position = new Vector3(-transform.position.x, transform.position.y, 0);
+            transform.position = new Vector3(-transform.position.x + 1, transform.position.y, 0);
+        }
+        else if ( tmpPos.x < -m_extent )
+        {
+            transform.position = new Vector3(-transform.position.x - 1, transform.position.y, 0);
         }
 
-        if (tmpPos.y > (Screen.height + m_extent) || tmpPos.y < -m_extent)
+        else if (tmpPos.y > (Screen.height + m_extent) ) 
         {
-            transform.position = new Vector3(transform.position.x, -transform.position.y, 0);
+            transform.position = new Vector3(transform.position.x, -transform.position.y + 1, 0);
+        }
+        else if ( tmpPos.y < -m_extent )
+        {
+            transform.position = new Vector3(transform.position.x, -transform.position.y - 1, 0);
         }
 	}
 

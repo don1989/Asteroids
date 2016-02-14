@@ -3,15 +3,21 @@ using System.Collections;
 
 public class Asteroid : Enemy {
 
-    private const float m_scaleThreshold = 25.0f; // Smallest we're allowed
+    private const float m_scaleThreshold = 20.0f; // Smallest we're allowed
 
     static GameController gameController = null;
+
+    private float m_randomRotationValue;
+
     protected override void Start() 
     {
         base.Start();
 
-        // TODO: Initialise with a random velocity
-        transform.forward = new Vector3(0.3f, 0.4f, 0);
+        float x = Random.Range(-1.0f, 1.0f);
+        float y = Random.Range(-1.0f, 1.0f);
+
+        m_randomRotationValue = Random.Range(200.0f, 400.0f);
+        transform.forward = new Vector3(x, y, 0);
         transform.forward.Normalize();
 
         transform.localRotation = Random.rotation;
@@ -34,31 +40,18 @@ public class Asteroid : Enemy {
         pos.z = 0;
         transform.position = pos;
 
-
-
-        // TODO: Rotate randomly
-        float h = 300 * Time.deltaTime;
+        // Rotate
         foreach (Transform child in transform)
         {
             if (child.name == "Sphere")
             {
-                Quaternion deltaRotation = child.localRotation * Quaternion.Euler(new Vector3(h, 0, 0) * Time.deltaTime);
+                float val = m_randomRotationValue * Time.deltaTime;
+
+                Quaternion deltaRotation = child.localRotation * Quaternion.Euler(new Vector3(val, 0, 0) * Time.deltaTime);
                 child.localRotation = deltaRotation;
                 break;
             }
         }
-
-        // If collision with bullet
-        
-        {
-            // if scale is big enough
-            {
-                // Generate 2 more asteroids
-            }
-            // Destroy self
-        }
-
-
 	}
 
     private void OnTriggerEnter(Collider col)
@@ -80,6 +73,9 @@ public class Asteroid : Enemy {
                 GameObject toDie = col.gameObject.transform.parent.gameObject;
                 if ( toDie.GetComponent<Player>().IsVulnerable() )
                 {
+                    GameObject particles = Instantiate(Resources.Load("Prefabs/ExplosionParticles"), transform.position, Quaternion.identity) as GameObject;
+                    Destroy(particles, 5.0f);
+
                     // Dead
                     gameController.DeductLife(toDie.transform.position, toDie.transform.rotation);
 
@@ -90,6 +86,9 @@ public class Asteroid : Enemy {
             }
             else if (col.gameObject.name.Contains("Alien"))
             {
+                GameObject particles = Instantiate(Resources.Load("Prefabs/ExplosionParticles"), transform.position, Quaternion.identity) as GameObject;
+                Destroy(particles, 5.0f);
+
                 Destroy(col.gameObject.transform.parent.gameObject);
                 BreakUp();
 
@@ -99,6 +98,9 @@ public class Asteroid : Enemy {
     
     private void BreakUp()
     {
+        GameObject particles = Instantiate(Resources.Load("Prefabs/AsteroidParticles"), transform.position, Quaternion.identity) as GameObject;
+        Destroy(particles, 5.0f);
+
         // Get half the max scale of this game object
         float halfScale = Mathf.Max(Mathf.Max(transform.localScale.x, transform.localScale.y), transform.localScale.z) * 0.5f;
 

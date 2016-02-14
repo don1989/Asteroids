@@ -52,6 +52,9 @@ public class Alien : Enemy {
             // Shot by the player
             if ( col.gameObject.tag.Contains("Player") )
             {
+                GameObject particles = Instantiate(Resources.Load("Prefabs/ExplosionParticles"), transform.position, Quaternion.identity) as GameObject;
+                Destroy(particles, 5.0f);
+
                 gameController.IncrementScore(20);
 
                 Destroy(col.gameObject); // Destroy bullet
@@ -62,13 +65,17 @@ public class Alien : Enemy {
         else if (col.gameObject.name.Contains("Player"))
         {
             GameObject toDie = col.gameObject.transform.parent.gameObject;
-            // Dead
-            gameController.DeductLife(toDie.transform.position, toDie.transform.rotation);
+            if (toDie.GetComponent<Player>().IsVulnerable())
+            {
+                GameObject particles = Instantiate(Resources.Load("Prefabs/ExplosionParticles"), transform.position, Quaternion.identity) as GameObject;
+                Destroy(particles, 5.0f);
 
-            Destroy(toDie);
-            Destroy(gameObject); // Destroy myself
+                // Dead
+                gameController.DeductLife(toDie.transform.position, toDie.transform.rotation);
 
-            
+                Destroy(toDie);
+                Destroy(gameObject); // Destroy myself
+            }
         }
         else if (col.gameObject.name.Contains("Alien"))
         {
