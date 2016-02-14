@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Alien : Enemy {
+public class Alien : WrappableObject {
 
     Vector3 m_velocity;
     public const float m_shootCooldown = 2.0f;
     public float m_shootCooldownTimer;
-    //private float movementAmount = 15.0f;
+    private float movementAmount = 5.0f;
 
     private Rigidbody m_rigidBody;
     static GameController gameController = null;

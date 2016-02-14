@@ -4,11 +4,21 @@ using System.Collections;
 
 public class GameController : MonoBehaviour {
 
+    enum GameState
+    {
+        MainMenu,
+        Playing,
+        GameOver
+    };
+
+
     private int m_score;
     private int m_lives;
 
     public Text m_scoreText;
     public Text m_livesText;
+    public Text m_startText;
+    public Text m_gameOverText;
 
     public Vector3 m_lastPlayerTransform;
     public Quaternion m_lastPlayerRotation;
@@ -16,6 +26,8 @@ public class GameController : MonoBehaviour {
     private float m_deathCooldown;
     private bool m_died;
 
+    private GameState m_gameState = GameState.MainMenu;
+    SpawnerScript m_spawnerScript;
 
 	void Start () 
     {
@@ -26,38 +38,96 @@ public class GameController : MonoBehaviour {
         m_lastPlayerTransform = new Vector3(0, 0, 0);
         m_lastPlayerRotation = new Quaternion();
         m_deathCooldown = 0.0f;
+
+        m_spawnerScript = GetComponent<SpawnerScript>();
 	}
 	
 	void Update () 
     {
-        m_scoreText.text = "Score: " + m_score;
-        m_livesText.text = "Lives: " + m_lives;
-   
-        if (m_died && m_lives > 0)
+        switch (m_gameState)
         {
-            m_deathCooldown -= Time.deltaTime;
+            case GameState.Playing:
+                {
+                    m_scoreText.text = "Score: " + m_score;
+                    m_livesText.text = "Lives: " + m_lives;
 
-            if (m_deathCooldown <=0)
-            {
-                // Respawn
-                GameObject playerObj = Instantiate(Resources.Load("Prefabs/Player"), m_lastPlayerTransform, m_lastPlayerRotation) as GameObject;
-                Player player = playerObj.GetComponent<Player>();
-                player.SetVulnerable( false );
+                    if ( m_died )
+                    {
+                        if ( m_lives > 0 )
+                        {
+                            m_deathCooldown -= Time.deltaTime;
 
-                m_died = false;
-            }
+                            if (m_deathCooldown <= 0)
+                            {
+                                // Respawn
+                                GameObject playerObj = Instantiate(Resources.Load("Prefabs/Player"), m_lastPlayerTransform, m_lastPlayerRotation) as GameObject;
+                                Player player = playerObj.GetComponent<Player>();
+                                player.SetVulnerable(false);
+
+                                m_died = false;
+                            }
+                        }
+                        else
+                        {
+                            // Game over
+                            m_gameState = GameState.GameOver;
+
+                            m_scoreText.enabled = true;
+                            m_livesText.enabled = false;
+                            m_startText.enabled = false;
+                            m_gameOverText.enabled = true;
+                        }
+                    }
+
+                    int asteroidCount = GameObject.FindGameObjectsWithTag("Asteroid").Length;
+                    if (asteroidCount == 0)
+                    {
+                        if (m_spawnerScript.AsteroidsToSpawnThisWave() <= 0)
+                        {
+                            m_spawnerScript.NextWave();
+                        }
+                    }
+
+                    break;
+                }
+            case GameState.MainMenu:
+                {
+                    m_scoreText.enabled = false;
+                    m_livesText.enabled = false;
+                    m_startText.enabled = true;
+                    m_gameOverText.enabled = false;
+
+                    if ( Input.GetKey(KeyCode.Return) )
+                    {
+                        m_spawnerScript.Playing = true;
+                        m_gameState = GameState.Playing;
+
+                        m_scoreText.enabled = true;
+                        m_livesText.enabled = true;
+
+                        m_startText.enabled = false;
+                        m_gameOverText.enabled = false;
+                    }
+
+                    break;
+                }
+            case GameState.GameOver:
+                {
+
+                    if (Input.GetKeyDown(KeyCode.Return))
+                    {
+                        Application.LoadLevel(0);
+                    }
+
+                    break;
+                }
+            default: break;
         }
+        
 
-        int asteroidCount = GameObject.FindGameObjectsWithTag("Asteroid").Length;
-        if (asteroidCount == 0)
+        if ( Input.GetKey(KeyCode.Escape) )
         {
-            GameObject spawner = GameObject.Find("Spawner");
-            SpawnerScript spawnerScript = spawner.GetComponent<SpawnerScript>();
-            
-            if ( spawnerScript && spawnerScript.AsteroidsToSpawnThisWave() <= 0 )
-            {
-                spawnerScript.NextWave();
-            }
+            Application.Quit();
         }
 
 	}

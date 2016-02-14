@@ -4,11 +4,11 @@ using System.Collections;
 public class SpawnerScript : MonoBehaviour {
 
     // Number of objects to spawn
-    private int m_asteroidsStart = 5;
+    private int m_asteroidsStart = 4;
     private int m_aliensStart = 1;
 
-    private int m_asteroidsToSpawn = 5;
-    private int m_aliensToSpawn = 1;
+    private int m_asteroidsToSpawn;
+    private int m_aliensToSpawn;
 
     // The time they will spawn in, in seconds
     private float m_asteroidSpawnTime = 0.0f;
@@ -23,6 +23,8 @@ public class SpawnerScript : MonoBehaviour {
 
     private const int m_alienRandomPositions = 2;
     Vector3[] m_alienSpawnPosition;
+
+    bool m_isPlaying;
 
 	void Start () 
     {
@@ -39,6 +41,7 @@ public class SpawnerScript : MonoBehaviour {
         m_asteroidsToSpawn = m_asteroidsStart;
         m_aliensToSpawn = m_aliensStart;
 
+        m_isPlaying = false;
 	}
 
     public void NextWave()
@@ -58,34 +61,43 @@ public class SpawnerScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
     {
-        if ( m_asteroidsToSpawn > 0 && m_asteroidSpawnTime <= 0 )
+        if (m_isPlaying)
         {
-            int randomInt = Random.Range(0, m_asteroidRandomPositions);
+            if (m_asteroidsToSpawn > 0 && m_asteroidSpawnTime <= 0)
+            {
+                int randomInt = Random.Range(0, m_asteroidRandomPositions);
 
-            GameObject obj = Instantiate(Resources.Load("Prefabs/Asteroid"), m_asteroidSpawnPosition[randomInt], Quaternion.identity) as GameObject;
+                GameObject obj = Instantiate(Resources.Load("Prefabs/Asteroid"), m_asteroidSpawnPosition[randomInt], Quaternion.identity) as GameObject;
 
-            obj.transform.localScale = new Vector3(Random.Range(90, 120), Random.Range(90, 120), Random.Range(90, 120));
+                obj.transform.localScale = new Vector3(Random.Range(90, 120), Random.Range(90, 120), Random.Range(90, 120));
 
-            m_asteroidSpawnTime = m_asteroidSpawnCooldown;
-            --m_asteroidsToSpawn;
+                m_asteroidSpawnTime = m_asteroidSpawnCooldown;
+                --m_asteroidsToSpawn;
+            }
+
+            if (m_aliensToSpawn > 0 && m_alienSpawnTime <= 0)
+            {
+                int randomInt = Random.Range(0, m_alienRandomPositions);
+
+                Instantiate(Resources.Load("Prefabs/Alien"), m_alienSpawnPosition[randomInt], Quaternion.identity);
+
+                m_alienSpawnTime = m_alienSpawnCooldown;
+                --m_aliensToSpawn;
+            }
+
+            m_asteroidSpawnTime -= Time.deltaTime;
+            m_alienSpawnTime -= Time.deltaTime;
         }
-
-        if (m_aliensToSpawn > 0 && m_alienSpawnTime <= 0)
-        {
-            int randomInt = Random.Range(0, m_alienRandomPositions);
-
-            Instantiate(Resources.Load("Prefabs/Alien"), m_alienSpawnPosition[randomInt], Quaternion.identity);
-
-            m_alienSpawnTime = m_alienSpawnCooldown;
-            --m_aliensToSpawn;
-        }
-
-        m_asteroidSpawnTime -= Time.deltaTime;
-        m_alienSpawnTime -= Time.deltaTime;
 	}
 
     public int AsteroidsToSpawnThisWave()
     {
         return m_asteroidsToSpawn;
+    }
+
+    public bool Playing
+    {
+        get { return this.m_isPlaying; }
+        set { this.m_isPlaying = value; }
     }
 }

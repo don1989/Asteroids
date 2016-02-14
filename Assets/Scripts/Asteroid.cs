@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Asteroid : Enemy {
+public class Asteroid : WrappableObject {
 
     private const float m_scaleThreshold = 20.0f; // Smallest we're allowed
-
+    public float m_movementAmount;
+    Vector3 m_direction;
     static GameController gameController = null;
 
     private float m_randomRotationValue;
@@ -13,14 +14,16 @@ public class Asteroid : Enemy {
     {
         base.Start();
 
+        m_randomRotationValue = Random.Range(200.0f, 400.0f);
+
+        transform.localRotation = Random.rotation;
+        m_movementAmount = 3.0f;
+
         float x = Random.Range(-1.0f, 1.0f);
         float y = Random.Range(-1.0f, 1.0f);
 
-        m_randomRotationValue = Random.Range(200.0f, 400.0f);
-        transform.forward = new Vector3(x, y, 0);
-        transform.forward.Normalize();
-
-        transform.localRotation = Random.rotation;
+        m_direction = new Vector3(x, y, 0);
+        m_direction.Normalize();
 
         // Get reference to game controller
         if ( gameController == null )
@@ -35,7 +38,7 @@ public class Asteroid : Enemy {
         base.FixedUpdate();
 
         // Move
-        transform.Translate(transform.forward * movementAmount * Time.deltaTime);
+        transform.Translate(m_direction * m_movementAmount * Time.deltaTime);
         Vector3 pos = transform.position;
         pos.z = 0;
         transform.position = pos;
