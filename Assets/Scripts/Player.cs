@@ -6,19 +6,29 @@ public class Player : WrappableObject {
     //public Vector3 m_initialDirection;
     public float m_rotationAmount;
     public float m_thrustAmount;
+    public const float m_shootCooldown = 0.3f;
+    public float m_shootCooldownTimer;
 
     private Rigidbody m_rigidBody;
-    
+    private bool m_isVulnerable = true;
+    private float m_vulnerableTime = 0.0f;
+    private float m_blinkTime = 0.0f;
+
 	protected override void Start () 
     {
         base.Start();
 
         // Constrain to x-y axis
         m_rigidBody = GetComponent<Rigidbody>();
-        //m_rigidBody.constraints = RigidbodyConstraints.FreezePositionZ;
+        m_rigidBody.constraints = RigidbodyConstraints.FreezePositionZ;
 
         //transform.rotation = Quaternion.LookRotation(m_initialDirection);
         //m_rigidBody.transform.forward = new Vector3(1, 0, 0);
+
+        m_shootCooldownTimer = 0;
+        /*m_vulnerableTime = 0.0f;
+        m_blinkTime = 0.0f;
+        m_isVulnerable = true;*/
 	}
 	
 	protected override void FixedUpdate () 
@@ -42,33 +52,65 @@ public class Player : WrappableObject {
 
 
         // Fire bullets
-        if ( Input.GetAxis("Fire1") == 1.0f )
+        if ( Input.GetAxis("Fire1") == 1.0f && m_shootCooldownTimer <= 0.0f )
         {
-            //GameObject obj = (GameObject)Instantiate(Resources.Load("BulletPrefab"), m_rigidBody.transform.position, Quaternion.identity);
-            // TODO: Recycle bullets
-            //obj.transform.forward = m_rigidBody.transform.forward;
+            m_shootCooldownTimer = m_shootCooldown;
+             
+            GameObject obj = Instantiate(Resources.Load("Prefabs/Bullet"),
+                m_rigidBody.transform.position + (m_rigidBody.transform.forward.normalized * 1.2f), 
+                Quaternion.identity) as GameObject;
+            obj.tag = "Player";
+
+             if (obj != null)
+             {
+                Bullet bullet = obj.GetComponent<Bullet>();
+                 if ( bullet )
+                 {
+                     
+                     bullet.SetDirection(m_rigidBody.transform.forward.normalized);
+                     //Debug.Log("Dir " + m_rigidBody.transform.forward.ToString());
+                 }
+             }
+        }
+
+        if ( m_shootCooldownTimer > 0.0f )
+        {
+            m_shootCooldownTimer -= Time.deltaTime;
+        }
+
+        if ( !m_isVulnerable )
+        {
+            if ( m_blinkTime <= 0.0f )
+            {
+                MeshRenderer myRenderer = GetComponentInChildren<MeshRenderer>();
+                myRenderer.enabled = !myRenderer.enabled;
+                m_blinkTime = 0.3f;
+            }
+
+            m_blinkTime -= Time.deltaTime;
+            
+
+            if ( m_vulnerableTime <= 0.0f )
+            {
+                MeshRenderer myRenderer = GetComponentInChildren<MeshRenderer>();
+                myRenderer.enabled = true;
+
+                m_isVulnerable = true;
+            }
+            
+            m_vulnerableTime -= Time.deltaTime;
         }
 	}
 
-
-
-    void OnCollisionEnter(Collision collision)
+    public void SetVulnerable( bool val )
     {
-        Debug.Log(collision.gameObject.name);
-        // Debug-draw all contact points and normals
-        foreach (ContactPoint contact in collision.contacts)
-        {
-            Debug.DrawRay(contact.point, contact.normal, Color.white);
-        }
-
-        // DEAD
-        // Play a sound if the colliding objects had a big impact.		
-        //if (collision.relativeVelocity.magnitude > 2)
-        //    audio.Play();
-
+        m_isVulnerable = false;
+        m_vulnerableTime = 5.0f;
     }
 
-
-
+    public bool IsVulnerable()
+    {
+        return m_isVulnerable;
+    }
 
 }

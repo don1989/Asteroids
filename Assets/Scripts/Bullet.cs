@@ -5,6 +5,9 @@ public class Bullet : WrappableObject {
 
 	// Use this for initialization
     private float m_speed = 20.0f;
+    private float m_lifetime = 2.0f;
+
+    Vector3 m_direction;
 
 	protected override void Start () 
     {
@@ -17,6 +20,21 @@ public class Bullet : WrappableObject {
         base.FixedUpdate();
 
 	    // We want this to move along its direction vector
-        transform.Translate(transform.forward * (m_speed * Time.deltaTime));
+        transform.Translate(m_direction * (m_speed * Time.deltaTime));
+
+        Vector3 tmpPos = transform.position;
+        tmpPos.z = 0;
+        transform.position = tmpPos;
+        
+        m_lifetime -= Time.deltaTime;
+        if ( m_lifetime < 0 )
+        {
+            Destroy(gameObject);
+        }
 	}
+
+    public void SetDirection( Vector3 dir )
+    {
+        m_direction = dir;
+    }
 }
