@@ -18,7 +18,7 @@ public class Asteroid : MonoBehaviour {
     {
         if (col.gameObject.name.Contains("Bullet"))
         {
-            if (col.gameObject.tag.Contains("Player")) // Player's bullet
+            if (col.gameObject.CompareTag("Player")) // Player's bullet
             {
                 GameController.Instance.IncrementScore(10);
 

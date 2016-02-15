@@ -18,3 +18,4 @@ C:\Users\DON\Documents\Unity Projects\Asteroids\Temp\bin\Debug\UnityEngine.UI.xm
 C:\Users\DON\Documents\Unity Projects\Asteroids\Temp\bin\Debug\UnityEngine.Networking.xml
 C:\Users\DON\Documents\Unity Projects\Asteroids\obj\Debug\Assembly-CSharp.dll
 C:\Users\DON\Documents\Unity Projects\Asteroids\obj\Debug\Assembly-CSharp.pdb
+C:\Users\DON\Documents\Unity Projects\Asteroids\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache

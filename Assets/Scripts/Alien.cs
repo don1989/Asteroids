@@ -52,7 +52,7 @@ public class Alien : MonoBehaviour
                 GameController.Instance.IncrementScore(20);
 
                 Destroy(col.gameObject); // Destroy bullet
-                Destroy(transform.parent.gameObject); // Destroy self
+                Destroy(gameObject); // Destroy self
             }
         }
         else if (col.gameObject.name.Contains("Player"))

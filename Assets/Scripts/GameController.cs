@@ -179,7 +179,7 @@ public class GameController : MonoBehaviour {
             m_livesText.enabled = true;
 
             m_startText.enabled = false;
-            m_gameOverText.enabled = false;
+            m_gameOverText.enabled = false;            
         }
     }
 }
