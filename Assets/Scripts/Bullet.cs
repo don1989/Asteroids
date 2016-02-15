@@ -3,15 +3,14 @@ using System.Collections;
 
 public class Bullet : MonoBehaviour {
 
-    private float m_speed = 20.0f;
-    private float m_lifetime = 1.0f;
+    public float m_speed;
+    public float m_lifetime;
 
-    Vector3 m_direction;
+    private Vector3 m_direction; // Direction to be set by shooter
 
-	void Start () 
+	void Start ()
     {
 	}
-
 
     void FixedUpdate() 
     {
@@ -29,8 +28,9 @@ public class Bullet : MonoBehaviour {
         }
 	}
 
-    public void SetDirection( Vector3 dir )
+    public Vector3 Direction
     {
-        m_direction = dir;
+        get { return m_direction; }
+        set { m_direction = value; }
     }
 }

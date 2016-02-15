@@ -24,14 +24,38 @@ public class SpawnerScript : MonoBehaviour {
     private const int m_alienRandomPositions = 2;
     Vector3[] m_alienSpawnPosition;
 
-    bool m_isPlaying;
-    private ArrayList m_spawnedObjectList;
+    private float m_powerupSpawnTime;
+    private bool m_powerupHasBeenSpawned;
+
+    private bool m_isPlaying;
+
+    public GameObject AsteroidPrefab;
+    public GameObject AlienPrefab;
+    public GameObject PowerupPrefab;
+    public GameObject PlayerPrefab;
+    public GameObject PlayerBulletPrefab;
+    public GameObject AlienBulletPrefab;
+    public GameObject ExplosionParticlesPrefab;
+    public GameObject AsteroidParticlesPrefab;
+
+    private static SpawnerScript m_instance = null;
+    public static SpawnerScript Instance
+    {
+        get
+        {
+            if (m_instance == null)
+            {
+                m_instance = (SpawnerScript)FindObjectOfType(typeof(SpawnerScript));
+            }
+            return m_instance;
+        }
+    }
 
 	void Start () 
     {
         m_asteroidSpawnPosition = new Vector3[m_asteroidRandomPositions];
         m_asteroidSpawnPosition[0] = new Vector3(0, 11, 0);
-        m_asteroidSpawnPosition[1] = new Vector3(0, -10, 0);
+        m_asteroidSpawnPosition[1] = new Vector3(0, -11, 0);
         m_asteroidSpawnPosition[2] = new Vector3(22, 0, 0);
         m_asteroidSpawnPosition[3] = new Vector3(-22, 0, 0);
 
@@ -42,9 +66,9 @@ public class SpawnerScript : MonoBehaviour {
         m_asteroidsToSpawn = m_asteroidsStart;
         m_aliensToSpawn = m_aliensStart;
 
-        m_isPlaying = false;
+        ResetPowerup();
 
-        m_spawnedObjectList = new ArrayList();
+        m_isPlaying = false;
 	}
 
     public void NextWave()
@@ -61,7 +85,6 @@ public class SpawnerScript : MonoBehaviour {
         Debug.Log("Next Wave");
     }
 	
-	// Update is called once per frame
 	void Update () 
     {
         if (m_isPlaying)
@@ -70,10 +93,7 @@ public class SpawnerScript : MonoBehaviour {
             {
                 int randomInt = Random.Range(0, m_asteroidRandomPositions);
 
-                GameObject obj = Instantiate(Resources.Load("Prefabs/Asteroid"), m_asteroidSpawnPosition[randomInt], Quaternion.identity) as GameObject;
-                m_spawnedObjectList.Add(obj);
-
-
+                GameObject obj = Instantiate(AsteroidPrefab, m_asteroidSpawnPosition[randomInt], Quaternion.identity) as GameObject;
                 obj.transform.localScale = new Vector3(Random.Range(90, 120), Random.Range(90, 120), Random.Range(90, 120));
 
                 m_asteroidSpawnTime = m_asteroidSpawnCooldown;
@@ -84,11 +104,23 @@ public class SpawnerScript : MonoBehaviour {
             {
                 int randomInt = Random.Range(0, m_alienRandomPositions);
 
-                GameObject obj = Instantiate(Resources.Load("Prefabs/Alien"), m_alienSpawnPosition[randomInt], Quaternion.identity) as GameObject;
-                m_spawnedObjectList.Add(obj);
+                Instantiate(AlienPrefab, m_alienSpawnPosition[randomInt], Quaternion.identity);
 
                 m_alienSpawnTime = m_alienSpawnCooldown;
                 --m_aliensToSpawn;
+            }
+
+            if (! m_powerupHasBeenSpawned )
+            {
+                m_powerupSpawnTime -= Time.deltaTime;
+                if ( m_powerupSpawnTime <= 0)
+                {
+                    int randomInt = Random.Range(0, m_asteroidRandomPositions);
+
+                    Instantiate(PowerupPrefab, m_asteroidSpawnPosition[randomInt], Quaternion.identity);
+
+                    m_powerupHasBeenSpawned = true;
+                }
             }
 
             m_asteroidSpawnTime -= Time.deltaTime;
@@ -99,6 +131,26 @@ public class SpawnerScript : MonoBehaviour {
     public int AsteroidsToSpawnThisWave()
     {
         return m_asteroidsToSpawn;
+    }
+
+    public void ResetPowerup()
+    {
+        m_powerupSpawnTime = Random.Range(30.0f, 60.0f);
+        m_powerupHasBeenSpawned = false;
+    }
+
+    public void RespawnPlayer( Vector3 lastPlayerPosition, Quaternion lastPlayerRotation )
+    {
+        // Allow the player to be able to collect the power up again
+        int powerupCount = GameObject.FindGameObjectsWithTag("Powerup").Length;
+        if (powerupCount == 0)
+        {
+            ResetPowerup();
+        }
+
+        GameObject playerObj = Instantiate(PlayerPrefab, lastPlayerPosition, lastPlayerRotation) as GameObject;
+        Player player = playerObj.GetComponent<Player>();
+        player.SetVulnerable(false);
     }
 
     public bool Playing

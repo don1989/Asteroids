@@ -3,19 +3,25 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 
-    //public Vector3 m_initialDirection;
     public float m_rotationAmount;
     public float m_thrustAmount;
-    public const float m_shootCooldown = 0.3f;
     public float m_shootCooldownTimer;
-
-    private Rigidbody m_rigidBody;
-    private bool m_isVulnerable = true;
     private float m_vulnerableTime = 0.0f;
+
+    private const float m_shootCooldown = 0.3f;
+    private Rigidbody m_rigidBody;
+
+
+    private bool m_isVulnerable = true;
+    private float m_vulnerableTimeSet = 5.0f;
+
+
+
     private float m_blinkTime = 0.0f;
 
-    static GameController gameController = null;
     ParticleSystem.EmissionModule m_thrustEmissions;
+
+    private bool m_powerupEnabled;
 
 	void Start () 
     {
@@ -25,47 +31,45 @@ public class Player : MonoBehaviour {
 
         m_shootCooldownTimer = 0;
 
-        // Get reference to game controller
-        if (gameController == null)
-        {
-            GameObject obj = GameObject.Find("GameController");
-            gameController = (GameController)obj.GetComponent<GameController>();
-        }
-
         ParticleSystem thrustParticleSystem = GetComponentInChildren<ParticleSystem>();
         if ( thrustParticleSystem )
         {
             m_thrustEmissions = thrustParticleSystem.emission;
         }
+
+        m_powerupEnabled = false;
+
 	}
 	
 	void FixedUpdate () 
     {
-
         HandleMovement();
         
-
-
         // Fire bullets
         if ( Input.GetAxis("Fire1") == 1.0f && m_shootCooldownTimer <= 0.0f )
         {
             m_shootCooldownTimer = m_shootCooldown;
-             
-            GameObject obj = Instantiate(Resources.Load("Prefabs/Bullet"),
-                m_rigidBody.transform.position + (m_rigidBody.transform.forward.normalized * 1.2f), 
-                Quaternion.identity) as GameObject;
-            obj.tag = "Player";
 
-             if (obj != null)
-             {
-                Bullet bullet = obj.GetComponent<Bullet>();
-                 if ( bullet )
-                 {
-                     
-                     bullet.SetDirection(m_rigidBody.transform.forward.normalized);
-                     //Debug.Log("Dir " + m_rigidBody.transform.forward.ToString());
-                 }
-             }
+            Vector3 middlePos = m_rigidBody.transform.position + (m_rigidBody.transform.forward.normalized * 1.2f);
+            GameObject obj = Instantiate(SpawnerScript.Instance.PlayerBulletPrefab, middlePos, Quaternion.identity) as GameObject;
+            Bullet bullet = obj.GetComponent<Bullet>();
+            bullet.Direction = m_rigidBody.transform.forward.normalized;
+
+            if ( m_powerupEnabled )
+            {
+                Vector3 leftPos = m_rigidBody.transform.position + (m_rigidBody.transform.up.normalized * 0.9f) + (m_rigidBody.transform.forward.normalized * 1.1f);
+                Vector3 rightPos = m_rigidBody.transform.position - (m_rigidBody.transform.up.normalized * 0.9f) + (m_rigidBody.transform.forward.normalized * 1.1f);
+
+                GameObject obj2 = Instantiate(SpawnerScript.Instance.PlayerBulletPrefab, leftPos, Quaternion.identity) as GameObject;
+                GameObject obj3 = Instantiate(SpawnerScript.Instance.PlayerBulletPrefab, rightPos, Quaternion.identity) as GameObject;
+
+
+                Bullet bullet2 = obj2.GetComponent<Bullet>();
+                bullet2.Direction = m_rigidBody.transform.forward.normalized;
+
+                Bullet bullet3 = obj3.GetComponent<Bullet>();
+                bullet3.Direction = m_rigidBody.transform.forward.normalized;
+            }            
         }
 
         if ( m_shootCooldownTimer > 0.0f )
@@ -121,7 +125,7 @@ public class Player : MonoBehaviour {
     public void SetVulnerable( bool val )
     {
         m_isVulnerable = false;
-        m_vulnerableTime = 5.0f;
+        m_vulnerableTime = m_vulnerableTimeSet;
     }
 
     public bool IsVulnerable()
@@ -131,23 +135,29 @@ public class Player : MonoBehaviour {
 
     private void OnTriggerEnter(Collider col)
     {
-        if ( m_isVulnerable )
+        if (col.gameObject.name.Contains("Bullet"))
         {
-            if (col.gameObject.name.Contains("Bullet"))
+            if ( m_isVulnerable )
             {
                 // Shot by the alien
                 if (col.gameObject.tag.Contains("Alien"))
                 {
-                    GameObject particles = Instantiate(Resources.Load("Prefabs/ExplosionParticles"), transform.position, Quaternion.identity) as GameObject;
+                    GameObject particles = Instantiate(SpawnerScript.Instance.ExplosionParticlesPrefab, transform.position, Quaternion.identity) as GameObject;
                     Destroy(particles, 5.0f);
 
                     Destroy(col.gameObject); // Destroy bullet
 
-                    gameController.DeductLife(transform.position, transform.rotation);
+                    GameController.Instance.DeductLife(transform.position, transform.rotation);
 
                     Destroy(gameObject); // Destroy self
                 }
             }
+        }
+        else if (col.gameObject.CompareTag("Powerup"))
+        {
+            Destroy(col.gameObject.transform.parent.gameObject);
+
+            m_powerupEnabled = true;
         }
     }
 

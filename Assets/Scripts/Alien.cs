@@ -10,52 +10,49 @@ public class Alien : MonoBehaviour
     private float movementAmount = 5.0f;
 
     private Rigidbody m_rigidBody;
-    static GameController gameController = null;
 
     void Start () 
     {
-        m_velocity = new Vector3( -1, 0, 0 );
+        int RandomInt = Random.Range(0, 2);
+
+        m_velocity = new Vector3( RandomInt > 0 ? - 1 : 1, 0, 0);
 
         m_rigidBody = GetComponent<Rigidbody>();
         m_rigidBody.constraints = RigidbodyConstraints.FreezePositionZ;
 
 
         m_shootCooldownTimer = 0;
-
-        // Get reference to game controller
-        if (gameController == null)
-        {
-            GameObject obj = GameObject.Find("GameController");
-            gameController = (GameController)obj.GetComponent<GameController>();
-        }
 	}
 	
     void FixedUpdate()
     {
         // Go left/right
-        transform.Translate(m_velocity * Time.deltaTime * movementAmount);
+        HandleMovement();
 
         Shoot();
 
         m_shootCooldownTimer -= Time.deltaTime;
 	}
 
+    private void HandleMovement()
+    {
+        transform.Translate(m_velocity * Time.deltaTime * movementAmount);
+    }
+
     private void OnTriggerEnter(Collider col)
     {
-        //Debug.Log("Collision " + col.gameObject.name);
         if (col.gameObject.name.Contains("Bullet"))
         {
             // Shot by the player
             if ( col.gameObject.tag.Contains("Player") )
             {
-                GameObject particles = Instantiate(Resources.Load("Prefabs/ExplosionParticles"), transform.position, Quaternion.identity) as GameObject;
+                GameObject particles = Instantiate(SpawnerScript.Instance.ExplosionParticlesPrefab, transform.position, Quaternion.identity) as GameObject;
                 Destroy(particles, 5.0f);
 
-                gameController.IncrementScore(20);
+                GameController.Instance.IncrementScore(20);
 
                 Destroy(col.gameObject); // Destroy bullet
-                Destroy(gameObject); // Destroy self
-
+                Destroy(transform.parent.gameObject); // Destroy self
             }
         }
         else if (col.gameObject.name.Contains("Player"))
@@ -63,19 +60,15 @@ public class Alien : MonoBehaviour
             GameObject toDie = col.gameObject.transform.parent.gameObject;
             if (toDie.GetComponent<Player>().IsVulnerable())
             {
-                GameObject particles = Instantiate(Resources.Load("Prefabs/ExplosionParticles"), transform.position, Quaternion.identity) as GameObject;
+                GameObject particles = Instantiate(SpawnerScript.Instance.ExplosionParticlesPrefab, transform.position, Quaternion.identity) as GameObject;
                 Destroy(particles, 5.0f);
 
                 // Dead
-                gameController.DeductLife(toDie.transform.position, toDie.transform.rotation);
+                GameController.Instance.DeductLife(toDie.transform.position, toDie.transform.rotation);
 
                 Destroy(toDie);
                 Destroy(gameObject); // Destroy myself
             }
-        }
-        else if (col.gameObject.name.Contains("Alien"))
-        {
-
         }
     }
 
@@ -85,22 +78,15 @@ public class Alien : MonoBehaviour
         {
             m_shootCooldownTimer = m_shootCooldown;
 
-            GameObject obj = Instantiate(Resources.Load("Prefabs/Bullet"), m_rigidBody.transform.position, Quaternion.identity) as GameObject;
-            obj.tag = "Alien";
+            GameObject obj = Instantiate(SpawnerScript.Instance.AlienBulletPrefab, m_rigidBody.transform.position, Quaternion.identity) as GameObject;
+            Bullet bullet = obj.GetComponent<Bullet>();
+            
+            // Random direction
+            float randomX = Random.Range(-1.0f, 1.0f);
+            float randomY = Random.Range(-1.0f, 1.0f);
 
-            if (obj != null)
-            {
-                Bullet bullet = obj.GetComponent<Bullet>();
-                if (bullet)
-                {
-                    // Random direction
-                    float randomX = Random.Range(-1.0f, 1.0f);
-                    float randomY = Random.Range(-1.0f, 1.0f);
-
-                    Vector3 randomDirection = new Vector3(randomX, randomY, 0);
-                    bullet.SetDirection(randomDirection.normalized);
-                }
-            }
+            Vector3 randomDirection = new Vector3(randomX, randomY, 0);
+            bullet.Direction = randomDirection.normalized;
         }
     }
 }
