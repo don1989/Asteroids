@@ -25,6 +25,7 @@ public class SpawnerScript : MonoBehaviour {
     Vector3[] m_alienSpawnPosition;
 
     bool m_isPlaying;
+    private ArrayList m_spawnedObjectList;
 
 	void Start () 
     {
@@ -42,6 +43,8 @@ public class SpawnerScript : MonoBehaviour {
         m_aliensToSpawn = m_aliensStart;
 
         m_isPlaying = false;
+
+        m_spawnedObjectList = new ArrayList();
 	}
 
     public void NextWave()
@@ -68,6 +71,8 @@ public class SpawnerScript : MonoBehaviour {
                 int randomInt = Random.Range(0, m_asteroidRandomPositions);
 
                 GameObject obj = Instantiate(Resources.Load("Prefabs/Asteroid"), m_asteroidSpawnPosition[randomInt], Quaternion.identity) as GameObject;
+                m_spawnedObjectList.Add(obj);
+
 
                 obj.transform.localScale = new Vector3(Random.Range(90, 120), Random.Range(90, 120), Random.Range(90, 120));
 
@@ -79,7 +84,8 @@ public class SpawnerScript : MonoBehaviour {
             {
                 int randomInt = Random.Range(0, m_alienRandomPositions);
 
-                Instantiate(Resources.Load("Prefabs/Alien"), m_alienSpawnPosition[randomInt], Quaternion.identity);
+                GameObject obj = Instantiate(Resources.Load("Prefabs/Alien"), m_alienSpawnPosition[randomInt], Quaternion.identity) as GameObject;
+                m_spawnedObjectList.Add(obj);
 
                 m_alienSpawnTime = m_alienSpawnCooldown;
                 --m_aliensToSpawn;

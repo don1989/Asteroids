@@ -50,6 +50,7 @@
      <Compile Include="Assets\Scripts\Bullet.cs" />
      <Compile Include="Assets\Scripts\GameController.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
+     <Compile Include="Assets\Scripts\RotateLocal.cs" />
      <Compile Include="Assets\Scripts\SpawnerScript.cs" />
      <Compile Include="Assets\Scripts\WrappableObject.cs" />
  <Reference Include="UnityEngine.UI">

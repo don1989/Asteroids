@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Alien : WrappableObject {
+public class Alien : MonoBehaviour
+{
 
     Vector3 m_velocity;
     public const float m_shootCooldown = 2.0f;
@@ -11,10 +12,8 @@ public class Alien : WrappableObject {
     private Rigidbody m_rigidBody;
     static GameController gameController = null;
 
-	protected override void Start () 
+    void Start () 
     {
-        base.Start();
-
         m_velocity = new Vector3( -1, 0, 0 );
 
         m_rigidBody = GetComponent<Rigidbody>();
@@ -31,11 +30,8 @@ public class Alien : WrappableObject {
         }
 	}
 	
-    protected override void FixedUpdate()
+    void FixedUpdate()
     {
-
-        base.FixedUpdate();
-
         // Go left/right
         transform.Translate(m_velocity * Time.deltaTime * movementAmount);
 

@@ -1,22 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Asteroid : WrappableObject {
+public class Asteroid : MonoBehaviour {
 
     private const float m_scaleThreshold = 20.0f; // Smallest we're allowed
     public float m_movementAmount;
     Vector3 m_direction;
     static GameController gameController = null;
 
-    private float m_randomRotationValue;
-
-    protected override void Start() 
+    void Start() 
     {
-        base.Start();
-
-        m_randomRotationValue = Random.Range(200.0f, 400.0f);
-
-        transform.localRotation = Random.rotation;
         m_movementAmount = 3.0f;
 
         float x = Random.Range(-1.0f, 1.0f);
@@ -33,29 +26,19 @@ public class Asteroid : WrappableObject {
         }
 	}
 
-    protected override void FixedUpdate() 
+    void FixedUpdate() 
     {
-        base.FixedUpdate();
+        HandleMovement();
+	}
 
-        // Move
+    private void HandleMovement()
+    {
         transform.Translate(m_direction * m_movementAmount * Time.deltaTime);
         Vector3 pos = transform.position;
         pos.z = 0;
         transform.position = pos;
+    }
 
-        // Rotate
-        foreach (Transform child in transform)
-        {
-            if (child.name == "Sphere")
-            {
-                float val = m_randomRotationValue * Time.deltaTime;
-
-                Quaternion deltaRotation = child.localRotation * Quaternion.Euler(new Vector3(val, 0, 0) * Time.deltaTime);
-                child.localRotation = deltaRotation;
-                break;
-            }
-        }
-	}
 
     private void OnTriggerEnter(Collider col)
     {

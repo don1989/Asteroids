@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Player : WrappableObject {
+public class Player : MonoBehaviour {
 
     //public Vector3 m_initialDirection;
     public float m_rotationAmount;
@@ -17,10 +17,8 @@ public class Player : WrappableObject {
     static GameController gameController = null;
     ParticleSystem.EmissionModule m_thrustEmissions;
 
-	protected override void Start () 
+	void Start () 
     {
-        base.Start();
-
         // Constrain to x-y axis
         m_rigidBody = GetComponent<Rigidbody>();
         m_rigidBody.constraints = RigidbodyConstraints.FreezePositionZ;
@@ -41,27 +39,10 @@ public class Player : WrappableObject {
         }
 	}
 	
-	protected override void FixedUpdate () 
+	void FixedUpdate () 
     {
-        base.FixedUpdate();
 
-        // Rotation
-        float h = Input.GetAxis("Horizontal") * m_rotationAmount * Time.deltaTime;
-        Quaternion deltaRotation = Quaternion.Euler(new Vector3(h, 0, 0) * Time.deltaTime);
-        m_rigidBody.MoveRotation(m_rigidBody.rotation * deltaRotation);
-
-
-        // Thrust
-        float t = Input.GetAxis("Vertical") * m_thrustAmount * Time.deltaTime;
-        if ( t > 0 )
-        {
-            m_rigidBody.AddForce(m_rigidBody.transform.forward * t);
-            m_thrustEmissions.enabled = true;
-        }
-        else
-        {
-            m_thrustEmissions.enabled = false;
-        }
+        HandleMovement();
         
 
 
@@ -115,6 +96,27 @@ public class Player : WrappableObject {
             m_vulnerableTime -= Time.deltaTime;
         }
 	}
+
+    private void HandleMovement()
+    {
+        // Rotation
+        float h = Input.GetAxis("Horizontal") * m_rotationAmount * Time.deltaTime;
+        Quaternion deltaRotation = Quaternion.Euler(new Vector3(h, 0, 0) * Time.deltaTime);
+        m_rigidBody.MoveRotation(m_rigidBody.rotation * deltaRotation);
+
+
+        // Thrust
+        float t = Input.GetAxis("Vertical") * m_thrustAmount * Time.deltaTime;
+        if (t > 0)
+        {
+            m_rigidBody.AddForce(m_rigidBody.transform.forward * t);
+            m_thrustEmissions.enabled = true;
+        }
+        else
+        {
+            m_thrustEmissions.enabled = false;
+        }
+    }
 
     public void SetVulnerable( bool val )
     {

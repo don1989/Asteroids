@@ -1,16 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class WrappableObject : MonoBehaviour {
+public class WrappableObject : MonoBehaviour {
 
     private float m_extent = 70.0f;
 
-    protected virtual void Start()
+    void Start()
     {
 
     }
 
-    protected virtual void FixedUpdate() 
+    void FixedUpdate() 
     {
 
         // (0, 0) is the bottom left corner in pixel coordinates, and the top-right corner is (Screen.width, Screen.height).
