@@ -57,7 +57,6 @@ public class SpawnerScript : MonoBehaviour {
         int spaceExtent = 400; // Some breathing room so things appear from off screen
         Vector3 extents = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width + spaceExtent, Screen.height + spaceExtent, Camera.main.transform.position.z));
 
-        Debug.Log(extents.ToString());
         m_asteroidSpawnPosition = new Vector3[m_asteroidRandomPositions];
         m_asteroidSpawnPosition[0] = new Vector3(0, extents.y, 0);
         m_asteroidSpawnPosition[1] = new Vector3(0, -extents.y, 0);
