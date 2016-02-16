@@ -30,6 +30,12 @@ public class GameController : MonoBehaviour {
 
     private GameState m_gameState;
 
+    public AudioClip deathAudioClip;
+    public AudioClip powerupAudioClip;
+    public AudioClip shootAudioClip;
+    public AudioClip explosionAudioClip;
+    private AudioSource audioSource;
+
     // Singleton
     private static GameController m_instance = null;
     public static GameController Instance
@@ -55,6 +61,8 @@ public class GameController : MonoBehaviour {
         m_deathCooldown = 0.0f;
 
         m_gameState = GameState.MainMenu;
+
+        audioSource = GetComponent<AudioSource>();
 	}
 	
 	void Update () 
@@ -91,6 +99,23 @@ public class GameController : MonoBehaviour {
         }
 
 	}
+
+    public void PlayDeathAudio()
+    {
+        audioSource.PlayOneShot(deathAudioClip);
+    }
+    public void PlayExplosionAudio()
+    {
+        audioSource.PlayOneShot(explosionAudioClip);
+    }
+    public void PlayShootingAudio()
+    {
+        audioSource.PlayOneShot(shootAudioClip);
+    }
+    public void PlayPowerupAudio()
+    {
+        audioSource.PlayOneShot(powerupAudioClip);
+    }
 
     public void IncrementScore( int amount )
     {
@@ -142,6 +167,8 @@ public class GameController : MonoBehaviour {
             }
             else
             {
+                PlayDeathAudio();
+
                 // Game over
                 m_gameState = GameState.GameOver;
 
@@ -181,5 +208,10 @@ public class GameController : MonoBehaviour {
             m_startText.enabled = false;
             m_gameOverText.enabled = false;            
         }
+    }
+
+    public bool IsPlaying()
+    {
+        return m_gameState == GameState.Playing;
     }
 }

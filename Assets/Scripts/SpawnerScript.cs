@@ -54,8 +54,9 @@ public class SpawnerScript : MonoBehaviour {
 
 	void Start () 
     {
-        int spaceExtent = 400; // Some breathing room so things appear from off screen
-        Vector3 extents = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width + spaceExtent, Screen.height + spaceExtent, Camera.main.transform.position.z));
+        int spaceExtentX = 400; // Some breathing room so things appear from off screen
+        int spaceExtentY = 400;
+        Vector3 extents = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width + spaceExtentX, Screen.height + spaceExtentY, Camera.main.transform.position.z));
 
         m_asteroidSpawnPosition = new Vector3[m_asteroidRandomPositions];
         m_asteroidSpawnPosition[0] = new Vector3(0, extents.y, 0);
@@ -78,6 +79,7 @@ public class SpawnerScript : MonoBehaviour {
 
     public void NextWave()
     {
+        // Make things harder for the next wave
         ++m_waveNumber;
 
         m_asteroidsStart += 2;
@@ -99,6 +101,7 @@ public class SpawnerScript : MonoBehaviour {
     {
         if (m_isPlaying)
         {
+            // Spawn asteroids
             if (m_asteroidsToSpawn > 0 && m_asteroidSpawnTime <= 0)
             {
                 int randomInt = Random.Range(0, m_asteroidRandomPositions);
@@ -110,6 +113,7 @@ public class SpawnerScript : MonoBehaviour {
                 --m_asteroidsToSpawn;
             }
 
+            // Spawn aliens
             if (m_aliensToSpawn > 0 && m_alienSpawnTime <= 0)
             {
                 int randomInt = Random.Range(0, m_alienRandomPositions);
@@ -120,6 +124,7 @@ public class SpawnerScript : MonoBehaviour {
                 --m_aliensToSpawn;
             }
 
+            // Spawn powerup
             if (! m_powerupHasBeenSpawned )
             {
                 m_powerupSpawnTime -= Time.deltaTime;
@@ -160,12 +165,21 @@ public class SpawnerScript : MonoBehaviour {
 
         GameObject playerObj = Instantiate(PlayerPrefab, lastPlayerPosition, lastPlayerRotation) as GameObject;
         Player player = playerObj.GetComponent<Player>();
-        player.SetVulnerable(false);
+        player.Vulnerable = false;
+        player.Playing = true;
     }
 
     public bool Playing
     {
         get { return this.m_isPlaying; }
-        set { this.m_isPlaying = value; }
+        set 
+        {
+            m_isPlaying = value;
+            Player player = FindObjectOfType<Player>();
+            if (player)
+            {
+                player.Playing = m_isPlaying;
+            }
+        }
     }
 }

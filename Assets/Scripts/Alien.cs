@@ -41,7 +41,8 @@ public class Alien : MonoBehaviour
                 GameObject particles = Instantiate(SpawnerScript.Instance.ExplosionParticlesPrefab, transform.position, Quaternion.identity) as GameObject;
                 Destroy(particles, 5.0f);
 
-                GameController.Instance.IncrementScore(20);
+                GameController.Instance.IncrementScore(30);
+                GameController.Instance.PlayExplosionAudio();
 
                 Destroy(col.gameObject); // Destroy bullet
                 Destroy(gameObject); // Destroy self
@@ -50,14 +51,14 @@ public class Alien : MonoBehaviour
         else if (col.gameObject.name.Contains("Player"))
         {
             GameObject toDie = col.gameObject.transform.parent.gameObject;
-            if (toDie.GetComponent<Player>().IsVulnerable())
+            if (toDie.GetComponent<Player>().Vulnerable )
             {
                 GameObject particles = Instantiate(SpawnerScript.Instance.ExplosionParticlesPrefab, transform.position, Quaternion.identity) as GameObject;
                 Destroy(particles, 5.0f);
 
                 // Dead
                 GameController.Instance.DeductLife(toDie.transform.position, toDie.transform.rotation);
-
+                GameController.Instance.PlayExplosionAudio();
                 Destroy(toDie);
                 Destroy(gameObject); // Destroy myself
             }

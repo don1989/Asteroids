@@ -8,7 +8,6 @@ public class RandomMovement : MonoBehaviour {
 
 	void Start () 
     {
-
         float x = Random.Range(-1.0f, 1.0f);
         float y = Random.Range(-1.0f, 1.0f);
 

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class WrappableObject : MonoBehaviour {
 
-    public int m_extent = 200;
+    public int m_extent = 200; // breathing room
 
     private int m_minExtentX;
     private int m_maxExtentX;
