@@ -3,41 +3,33 @@ using System.Collections;
 
 public class Alien : MonoBehaviour
 {
-
-    Vector3 m_velocity;
-    public const float m_shootCooldown = 2.0f;
-    public float m_shootCooldownTimer;
-    private float movementAmount = 5.0f;
-
+    public float m_shootCooldown = 2.0f;
+    public float m_movementAmount = 5.0f;
+    
+    private float m_shootCooldownTimer;
     private Rigidbody m_rigidBody;
+    private Vector3 m_direction;
 
     void Start () 
     {
-        int RandomInt = Random.Range(0, 2);
-
-        m_velocity = new Vector3( RandomInt > 0 ? - 1 : 1, 0, 0);
+        m_shootCooldownTimer = 0;
 
         m_rigidBody = GetComponent<Rigidbody>();
         m_rigidBody.constraints = RigidbodyConstraints.FreezePositionZ;
 
-
-        m_shootCooldownTimer = 0;
+        int RandomInt = Random.Range(0, 2);
+        m_direction = new Vector3(RandomInt > 0 ? -1 : 1, 0, 0);
 	}
 	
     void FixedUpdate()
     {
         // Go left/right
-        HandleMovement();
+        transform.Translate(m_direction * Time.deltaTime * m_movementAmount);
 
         Shoot();
 
         m_shootCooldownTimer -= Time.deltaTime;
 	}
-
-    private void HandleMovement()
-    {
-        transform.Translate(m_velocity * Time.deltaTime * movementAmount);
-    }
 
     private void OnTriggerEnter(Collider col)
     {
@@ -78,7 +70,7 @@ public class Alien : MonoBehaviour
         {
             m_shootCooldownTimer = m_shootCooldown;
 
-            GameObject obj = Instantiate(SpawnerScript.Instance.AlienBulletPrefab, m_rigidBody.transform.position, Quaternion.identity) as GameObject;
+            GameObject obj = Instantiate(SpawnerScript.Instance.AlienBulletPrefab, transform.position, Quaternion.identity) as GameObject;
             Bullet bullet = obj.GetComponent<Bullet>();
             
             // Random direction

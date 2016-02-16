@@ -14,9 +14,6 @@ public class Player : MonoBehaviour {
 
     private bool m_isVulnerable = true;
     private float m_vulnerableTimeSet = 5.0f;
-
-
-
     private float m_blinkTime = 0.0f;
 
     ParticleSystem.EmissionModule m_thrustEmissions;
@@ -46,7 +43,7 @@ public class Player : MonoBehaviour {
         HandleMovement();
         
         // Fire bullets
-        if ( Input.GetAxis("Fire1") == 1.0f && m_shootCooldownTimer <= 0.0f )
+        if ( m_shootCooldownTimer <= 0.0f && ( Input.GetAxis("Fire1") == 1.0f || Input.GetKeyDown("space") ) )
         {
             m_shootCooldownTimer = m_shootCooldown;
 
@@ -62,7 +59,6 @@ public class Player : MonoBehaviour {
 
                 GameObject obj2 = Instantiate(SpawnerScript.Instance.PlayerBulletPrefab, leftPos, Quaternion.identity) as GameObject;
                 GameObject obj3 = Instantiate(SpawnerScript.Instance.PlayerBulletPrefab, rightPos, Quaternion.identity) as GameObject;
-
 
                 Bullet bullet2 = obj2.GetComponent<Bullet>();
                 bullet2.Direction = m_rigidBody.transform.forward.normalized;

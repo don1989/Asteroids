@@ -7,7 +7,6 @@ public class RotateLocal : MonoBehaviour {
     
 	void Start () 
     {
-
         m_randomRotationSpeedValue = Random.Range(500.0f, 1000.0f);
 
         // Initialise each child object with a random location
@@ -15,7 +14,6 @@ public class RotateLocal : MonoBehaviour {
         {
             child.localRotation = Random.rotation;
         }
-
 	}
 	
 

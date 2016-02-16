@@ -4,8 +4,8 @@ using System.Collections;
 public class SpawnerScript : MonoBehaviour {
 
     // Number of objects to spawn
-    private int m_asteroidsStart = 4;
-    private int m_aliensStart = 1;
+    public int m_asteroidsStart = 4;
+    public int m_aliensStart = 1;
 
     private int m_asteroidsToSpawn;
     private int m_aliensToSpawn;
@@ -15,8 +15,8 @@ public class SpawnerScript : MonoBehaviour {
     private float m_alienSpawnTime = 10.0f;
 
     // Time in seconds to spawn the next one
-    private float m_asteroidSpawnCooldown = 6.0f;
-    private float m_alienSpawnCooldown = 15.0f;
+    public float m_asteroidSpawnCooldown = 6.0f;
+    public float m_alienSpawnCooldown = 15.0f;
 
     private const int m_asteroidRandomPositions = 4;
     Vector3[] m_asteroidSpawnPosition;
@@ -28,6 +28,7 @@ public class SpawnerScript : MonoBehaviour {
     private bool m_powerupHasBeenSpawned;
 
     private bool m_isPlaying;
+    private int m_waveNumber;
 
     public GameObject AsteroidPrefab;
     public GameObject AlienPrefab;
@@ -53,15 +54,19 @@ public class SpawnerScript : MonoBehaviour {
 
 	void Start () 
     {
+        int spaceExtent = 400; // Some breathing room so things appear from off screen
+        Vector3 extents = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width + spaceExtent, Screen.height + spaceExtent, Camera.main.transform.position.z));
+
+        Debug.Log(extents.ToString());
         m_asteroidSpawnPosition = new Vector3[m_asteroidRandomPositions];
-        m_asteroidSpawnPosition[0] = new Vector3(0, 11, 0);
-        m_asteroidSpawnPosition[1] = new Vector3(0, -11, 0);
-        m_asteroidSpawnPosition[2] = new Vector3(22, 0, 0);
-        m_asteroidSpawnPosition[3] = new Vector3(-22, 0, 0);
+        m_asteroidSpawnPosition[0] = new Vector3(0, extents.y, 0);
+        m_asteroidSpawnPosition[1] = new Vector3(0, -extents.y, 0);
+        m_asteroidSpawnPosition[2] = new Vector3(extents.x, 0, 0);
+        m_asteroidSpawnPosition[3] = new Vector3(-extents.x, 0, 0);
 
         m_alienSpawnPosition = new Vector3[m_alienRandomPositions];
-        m_alienSpawnPosition[0] = new Vector3(-18, 4, 0);
-        m_alienSpawnPosition[1] = new Vector3(18, -4, 0);
+        m_alienSpawnPosition[0] = new Vector3(-extents.x, 4, 0);
+        m_alienSpawnPosition[1] = new Vector3(extents.x, -4, 0);
 
         m_asteroidsToSpawn = m_asteroidsStart;
         m_aliensToSpawn = m_aliensStart;
@@ -69,10 +74,13 @@ public class SpawnerScript : MonoBehaviour {
         ResetPowerup();
 
         m_isPlaying = false;
+        m_waveNumber = 1;
 	}
 
     public void NextWave()
     {
+        ++m_waveNumber;
+
         m_asteroidsStart += 2;
         ++m_aliensStart;
 
@@ -81,6 +89,9 @@ public class SpawnerScript : MonoBehaviour {
 
         m_asteroidSpawnTime = 0.0f;
         m_alienSpawnTime = 10.0f;
+
+        m_asteroidSpawnCooldown -= 0.15f;
+        m_alienSpawnCooldown -= 0.15f;
 
         Debug.Log("Next Wave");
     }

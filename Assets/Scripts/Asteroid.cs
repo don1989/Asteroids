@@ -3,16 +3,7 @@ using System.Collections;
 
 public class Asteroid : MonoBehaviour {
 
-    private const float m_scaleThreshold = 20.0f; // Smallest we're allowed
-
-    void Start() 
-    {
-	}
-
-    void FixedUpdate() 
-    {
-	}
-
+    public float m_scaleThreshold = 20.0f; // Smallest we're allowed
 
     private void OnTriggerEnter(Collider col)
     {
@@ -43,6 +34,8 @@ public class Asteroid : MonoBehaviour {
                 BreakUp();
             }
         }
+        // Alien currently indestructible
+        /*
         else if (col.gameObject.name.Contains("Alien"))
         {
             GameObject particles = Instantiate(SpawnerScript.Instance.ExplosionParticlesPrefab, transform.position, Quaternion.identity) as GameObject;
@@ -50,7 +43,7 @@ public class Asteroid : MonoBehaviour {
 
             Destroy(col.gameObject.transform.parent.gameObject);
             BreakUp();
-        }
+        }*/
     }
     
     private void BreakUp()
